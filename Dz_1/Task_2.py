@@ -1,42 +1,40 @@
-# Содержимое файла /etc/os-release:
-# PRETTY_NAME="Ubuntu 22.04.4 LTS"
-# NAME="Ubuntu"
-# VERSION_ID="22.04"
-# VERSION="22.04.4 LTS (Jammy Jellyfish)"
-# VERSION_CODENAME=jammy
-# ID=ubuntu
-# ID_LIKE=debian
-# HOME_URL="https://www.ubuntu.com/"
-# SUPPORT_URL="https://help.ubuntu.com/"
-# BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
-# PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
-# UBUNTU_CODENAME=jammy
-
+"""
+Задание 2. (повышенной сложности)
+Доработать функцию из предыдущего задания таким образом, чтобы у неё появился дополнительный режим работы,
+в которомвывод разбивается на слова с удалением всех знаков пунктуации (их можно взять из списка string.punctuation
+модуля string). В этом режиме должно проверяться наличие слова в выводе.
+"""
 
 import subprocess
-import string
+import re
 
 
-def check_output_for_text(command, search_text, word_mode=False):
-    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, encoding='utf-8')
-    out = result.stdout
+def func(command, text, task=1):
+    res = subprocess.run(command, shell=True, stdout=subprocess.PIPE, encoding="utf-8")
+    out = res.stdout
 
-    if word_mode:
-        out = out.translate(str.maketrans('', '', string.punctuation)).split()
-        for element in out:
-            print(element)
+    print(out)
+    if res.returncode == 0:
+        if task == 1:
+            print(out)
+        elif task == 2:
+            out = re.sub(r'[^\w\s]', ' ', out)
+            print(out)
+        else:
+            print("Такого задания нет!")
+            raise ValueError
 
-    if result.returncode == 0 and (search_text in out if word_mode else search_text in result.stdout):
-        return True
+        if text in out:
+            return True
+        else:
+            return False
     else:
-        return False
+        print("FAIL! Code isn't 0")
 
 
-if __name__ == '__main__':
-    cmd = "cat /etc/os-release"
-    search_txt = "LTS"
-    is_successful = check_output_for_text(cmd, search_txt, word_mode=True)
-    if is_successful:
-        print(f'Команда "{cmd}" успешно выполнена, и слово "{search_txt}" найдено.')
-    else:
-        print("Команда не выполнена успешно или слово не найдено.")
+if __name__ == "__main__":
+    command_1 = "ls -la"
+    text_1 = "dr"
+    task_2 = 2
+
+    print(func(command_1, text_1, task_2))
